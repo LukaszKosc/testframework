@@ -1,37 +1,3 @@
-# import winrm
-#
-# sess = winrm.Session('http://192.168.88.128', auth=('kostek', 'kostek'))
-# cmds = ["ipconfig /all", "ipconfig /flushdns", "nslookup wp.pl"]
-#
-# def run_command(cmdline):
-#     print('----- running cmd: {} ------'.format(cmdline))
-#     if " " in cmdline:
-#         cmd_parts = cmdline.split()
-#         cmd = cmd_parts[0]
-#         args = cmd_parts[1:]
-#     result = sess.run_cmd(cmd, args)
-#     print('---- result: {} -----'.format(result))
-#
-#     print(result.std_err)  # .decode("utf-8"):
-#     print(result.std_out)
-#
-#
-# def run_ps(cmd):
-#     result = sess.run_ps(cmd)
-#     print(result)
-#     print(result.std_out)
-#     print(result.std_err)
-#
-#
-# ps_cmds = ["""$computerName=$Host
-# echo $computerName
-# """, """hostname"""]
-#
-# for cmd in cmds:
-#     run_command(cmd)
-#
-# # for cmd in ps_cmds:
-# #    run_ps(cmd)
 import winrm
 
 
@@ -61,11 +27,11 @@ class WinRMConnection:
                 else:
                     connection_session = winrm.Session('http://{}'.format(self._hostname),
                                                        auth=(self._username, self._password))
-                    
+
             except TimeoutError as e:
                 print("TimeoutError(caught):", e)
                 connection_session = None
-            
+
         except Exception as e:
             print(e.message)
             connection_session = None
@@ -128,7 +94,3 @@ class WinRMConnection:
     def __del__(self):
         print('Disconnecting from host "{}"'.format(self._hostname))
         self.disconnect()
-
-
-if __name__ == "__main__":
-    print(WinRMConnection('192.168.88.128', 'kostek', 'kostek').execute_command("ipconfig"))

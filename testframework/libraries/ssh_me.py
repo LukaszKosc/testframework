@@ -1,40 +1,7 @@
-# import paramiko
-#
-# hostname = "192.168.88.138"
-# username = "kostek"
-# password = "kostek"
-# cmd = 'ip address show'
-#
-# try:
-#     ssh = paramiko.SSHClient()
-#     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-#     try:
-#         ssh.connect(hostname, username=username, password=password)
-#         print("Connected to %s" % hostname)
-#     except TimeoutError as e:
-#         print("TimeoutError(caught):", e)
-#
-# except paramiko.AuthenticationException:
-#     print("Failed to connect to %s due to wrong username/password" %hostname)
-#     exit(1)
-#
-# except Exception as e:
-#     print(e.message)
-#     exit(2)
-#
-# try:
-#     stdin, stdout, stderr = ssh.exec_command(cmd)
-# except Exception as e:
-#     print(e.message)
-#
-# err = ''.join(stderr.readlines())
-# out = ''.join(stdout.readlines())
-# final_output = str(out) + str(err)
-# print(final_output)
 import socket
 import paramiko
 import traceback
-from testframework.libraries.logging_system import logger
+from testframework.libraries.logger import logger
 
 
 class SSHConnection:
@@ -48,7 +15,7 @@ class SSHConnection:
             self._timeout = timeout
         if self.is_host_alive():
             self._ssh_connection = self._connect()
-        
+
     def is_host_alive(self):
         try:
             self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -58,22 +25,22 @@ class SSHConnection:
             if connected:
                 self._sock.close()
             return connected
-        
+
         except TimeoutError as e:
             logger.Debug('TimeoutError: {}'.format(e))
             logger.Debug(traceback.print_exc())
             return False
-        
+
         except Exception as e:
             return False
-        
+
     def connected(self):
         if self._ssh_connection:
             if self._ssh_connection.get_transport():
                 if self._ssh_connection.get_transport().is_active():
                     return True
         return False
-        
+
     def _connect(self):
         try:
             ssh = paramiko.SSHClient()
@@ -111,12 +78,13 @@ class SSHConnection:
             return '', str(e)
 
     def execute_commands(self, commands):
-        commands = commands.split('\r\n') if isinstance(commands, str) else commands
         replies = {}
-        for cmd in commands:
-            stdout, stderr = self.execute_command(cmd)
-            if not stderr:
-                replies[cmd] = stdout
+        if self.connected():
+            commands = commands.split('\r\n') if isinstance(commands, str) else commands
+            for cmd in commands:
+                stdout, stderr = self.execute_command(cmd)
+                if not stderr:
+                    replies[cmd] = stdout
         return replies
 
     def disconnect(self):
@@ -133,7 +101,3 @@ class SSHConnection:
 
     def __del__(self):
         pass
-
-
-# if __name__ == "__main__":
-#     print(SSHConnection('192.168.88.138', 'kostek', 'kostek').execute_command("ip a"))

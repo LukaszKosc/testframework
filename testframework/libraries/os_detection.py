@@ -23,14 +23,11 @@ class DetectOS:
             pass
 
     def os(self):
-        if self._os:
-            return self._os
-        else:
-            return 'No OS'
-        
+        return self._os if self._os else 'No OS'
+
     def host_alive(self):
         return True if self.os() == 'windows' or self.os() == 'linux' else False
-    
+
     def _detect_os(self, port):
         try:
             self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -49,8 +46,3 @@ class DetectOS:
 
     def __str__(self):
         return '({}: {})'.format(self._ip, self.os())
-
-
-if __name__ == "__main__":
-    print(DetectOS('192.168.88.128').os())
-    print(DetectOS('192.168.88.138').os())
