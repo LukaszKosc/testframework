@@ -44,13 +44,11 @@ class TestCase(Base):
                self.test_case_names, self.module_path, self.run_path, self.created, self.updated)
 
     def fields(self):
-        fields = [field for field in self.__dict__ if not field.startswith('_')]
-        return fields
+        return [field for field in self.__dict__ if not field.startswith('_')]
 
     @staticmethod
     def excluded_fields():
-        excluded_fields = ['id', 'created', 'updated', 'execution_id']
-        return excluded_fields
+        return ['id', 'created', 'updated', 'execution_id']
 
     def get_field(self, field_name):
         return getattr(self, field_name)
@@ -162,12 +160,9 @@ class Db_Operator:
         return None
 
     def retrieve_tests(self, where_filter):
-        where_filter = where_filter.replace(' %', ' "%')
-        where_filter = where_filter.replace('% ', '%" ')
-        where_filter = where_filter.replace('%;', '%";')
+        where_filter = where_filter.replace(' %', ' "%').replace('% ', '%" ').replace('%;', '%";')
         result = self.session.execute(text(where_filter)).all()
-        result = [item[0] for item in result]
-        return result
+        return [item[0] for item in result]
 
     def update_record(self, record, updated_values):
         test_case_query = self.session.query(TestCase).filter_by(id=record.get_field('id'))
