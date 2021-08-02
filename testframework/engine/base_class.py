@@ -7,12 +7,10 @@ from testframework.libraries.timers import get_time_delta
 from testframework.libraries.config import config
 
 
-
 class BaseTest(object):
     def __init__(self, *args, **kwargs):
         # register what will happen at exit of object
         atexit.register(self.cleanup_basetest)
-
         # register execution start of test suite
         self._suite_timestamp_start = datetime.now()
         self._suite_timestamp_stop = None
@@ -22,7 +20,6 @@ class BaseTest(object):
         else:
             if hasattr(BaseTest, '_setup_class'):
                 BaseTest._setup_class()
-
         # run all methods matching regex
         members = inspect.getmembers(self)
         method_matcher = re.compile(config['test_regexes']['method_regex'])
@@ -30,14 +27,13 @@ class BaseTest(object):
         for test in methods_members:
             setattr(self, test, self.wrap_method(getattr(self, test)))
             getattr(self, test)()
-    
+
     def wrap_method(self, f):
         def wrapper(*args, **kwargs):
             test_timestamp_start = datetime.now()
             stop_test = False
             test_name = f.__name__
             setattr(self, '_test_name', test_name)
-
             if 'setup_method' in dir(self.__class__):
                 if hasattr(self, 'setup_method'):
                     logger.Debug('{}: setup_method - scenario_name: "{}"'.format(self.__class__.__name__, test_name))
@@ -55,11 +51,9 @@ class BaseTest(object):
                         logger.Info('Execution of test "{}" omitted, as for '.format(test_name))
                         for error in self.Errors:
                             logger.Info('\r\ncommand: "{}" \r\noccurred error: "{}" '.format(error['cmd'], error['error']))
-
             if not stop_test:
                 #if not hasattr(self, 'Errors') and not self.Errors:
                 f(*args, **kwargs)
-            
             if 'teardown_method' in dir(self.__class__):
                 if hasattr(self, 'teardown_method'):
                     logger.Debug('{}: teardown_method - scenario_name: "{}"'.format(self.__class__.__name__, test_name))
@@ -71,21 +65,25 @@ class BaseTest(object):
             test_delta = get_time_delta(test_timestamp_stop, test_timestamp_start)
             logger.Debug('Test: "{}" duration: {}'.format(test_name, test_delta))
         return wrapper
-    
+
     def _setup_method(self):
-        logger.Debug('--------- _setup_method of {} class -----------'.format(self.__class__.__name__))
+        # logger.Debug('--------- _setup_method of {} class -----------'.format(self.__class__.__name__))
+        pass
 
     def _teardown_method(self):
-        logger.Debug('--------- _teardown_method of {} class -----------'.format(self.__class__.__name__))
+        # logger.Debug('--------- _teardown_method of {} class -----------'.format(self.__class__.__name__))
+        pass
 
     @classmethod
     def _setup_class(cls):
-        logger.Debug('{} _setup_class'.format(BaseTest.__name__))
+        # logger.Debug('{} _setup_class'.format(BaseTest.__name__))
+        pass
 
     @classmethod
     def _teardown_class(cls):
-        logger.Debug('{} _teardown_class'.format(BaseTest.__name__))
-    
+        # logger.Debug('{} _teardown_class'.format(BaseTest.__name__))
+        pass
+
     def cleanup_basetest(self):
         if hasattr(self.__class__, 'teardown_class'):
             getattr(self.__class__, 'teardown_class')()

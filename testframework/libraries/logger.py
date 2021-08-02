@@ -6,7 +6,7 @@ from testframework.libraries.config import config
 
 
 class Logger:
-    def __init__(self, name, results_dir, level, FORMAT='%(asctime)-15s %(message)s',
+    def __init__(self, name, tmp_dir, level, FORMAT='%(asctime)-15s %(message)s',
                  save_to_file=True, console=True):
         atexit.register(self.separate_logs)
 
@@ -17,7 +17,7 @@ class Logger:
             'CRITICAL': logging.CRITICAL,
         }
         self.formatter = logging.Formatter(FORMAT)
-        self.logger_file_output = results_dir
+        self.logger_file_output = tmp_dir
         self.logger = logging.getLogger(name)
         self.set_level(level)
         self.console_on() if console else self.console_off()
@@ -104,5 +104,12 @@ class Logger:
         for log_level in levels:
             del lv['{}_logs'.format(log_level)]
 
+    @property
+    def results_dir(self):
+        return self._results_dir
+
+    @results_dir.setter
+    def results_dir(self, value):
+        self._results_dir = value
 
 logger = Logger('info', config['results_dir'], level='DEBUG')
