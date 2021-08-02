@@ -1,5 +1,5 @@
 CLASS_REGEX = 'TestSuite'
-ETHOD_REGEX = 'test_'
+METHOD_REGEX = 'test_'
 FILE_REGEX = 'test_'
 CUSTOM_RESULTS_DIR_PREFIX = ''
 RESULTS_DIR = 'Results'
